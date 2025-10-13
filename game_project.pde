@@ -2,6 +2,7 @@ boolean jump = false;
 boolean left;
 boolean right;
 boolean on = true;
+boolean restart = false;
 float grav = 20;
 float speed = 8;
 float speedP = 8;
@@ -19,6 +20,9 @@ float y2;
 float x3;
 float y3;
 float variation = 1;
+float accel =0.01;
+
+
 
 void setup(){
   size(1200,800);
@@ -34,6 +38,9 @@ void keyPressed(){
   if(key =='a'){
     left = true;
   }
+  if(key == 'R'){
+    restart = true;
+  }
 }
 
 void keyReleased(){
@@ -46,11 +53,14 @@ void keyReleased(){
   if(key =='a'){
     left = false;
   }
+  if(key == 'R'){
+    restart = false;
+  }
 }
 void draw(){
   background(40);
   line(0,floorY, 1200, 750);
-  speedP += 0.005;
+  speedP += accel;
   //rules
   yR += grav;
   if (yR+50 >= floorY || jump){
@@ -84,19 +94,19 @@ void draw(){
   float bodyCY = yR + 25;
   // objectives
   if(!on){
-  x = random(10,1190);
-  y = random(10,floorY-10);
+    x = random(10,1190);
+    y = random(10,floorY-10);
   }
   fill (255,255,0);
   circle(x,y,20);
   //  hit boxes
   float distance = sqrt(pow(x - xR, 2) + pow(y - yR, 2));
-  if (distance <= 35) {
-  on = false;
-  score += 1;
+  if (distance <= 40) {
+    on = false;
+    score += 1;
   } 
   else {
-  on = true;
+    on = true;
   }
   //score board
   textSize(32);
@@ -125,7 +135,7 @@ void draw(){
   }
   x2 += speedP;
   y2 += variation*speedP;
-  // projectiles from right side
+  // projectiles from right sidea
   float lethal3 = sqrt(pow((x3+5) - (bodyCX), 2) + pow((y3+5) - (bodyCY), 2));
   triangle(x3,y3, x3+10,y3,x3+5, y3+10);
   if (x3 >= 1250 || y3 >= 850){
@@ -134,14 +144,36 @@ void draw(){
     variation = random(-1, 1);
   }
   x3 -= speedP;
-  y3 += variation*speed;
+  y3 += variation*speedP;
   //death
   if (lethal < 20 || lethal2 < 20 || lethal3 < 20)  {
     textSize(200);
     text("Game Over", 100, 400);
+    textSize(40);
+    text("Press shift + r to restart", 400, 600);
     speed = 0;
     speedP =0;
+    accel = 0;
     jump = false;
     grav=0;
+    yeet = 0;
+      if(restart){
+       speed = 8;
+       score=0;
+       speedP = 8;
+       grav = 20;
+       xR =600;
+       yR = 650;
+       x = 600;
+       y = 400;
+       xP = 0;
+       yP=0;
+       x2=0;
+       y2=0;
+       x3=0;
+       y3=0;
+       yeet = 13;
+     }
   }
+ 
 }
