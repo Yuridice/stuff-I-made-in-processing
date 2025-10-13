@@ -19,8 +19,17 @@ float x2;
 float y2;
 float x3;
 float y3;
+float xC = -30;
+float yC = -30;
+float xC2 = -30;
+float yC2 = -30;
+float xC3 = -30;
+float yC3 = -30;
 float variation = 1;
-float accel =0.01;
+float variationC = 1;
+float accel =0.001;
+float time;
+int unit = 1;
 
 
 
@@ -61,6 +70,9 @@ void draw(){
   background(40);
   line(0,floorY, 1200, 750);
   speedP += accel;
+  time += unit;
+  float seconds = time/60;
+   text(seconds, 20,20);
   //rules
   yR += grav;
   if (yR+50 >= floorY || jump){
@@ -99,7 +111,7 @@ void draw(){
   }
   fill (255,255,0);
   circle(x,y,20);
-  //  hit boxes
+  //  hit boxes for objectives
   float distance = sqrt(pow(x - xR, 2) + pow(y - yR, 2));
   if (distance <= 40) {
     on = false;
@@ -111,42 +123,84 @@ void draw(){
   //score board
   textSize(32);
   text(score, 600, 200 );
+  //projectiles 
   // projectiles from top
-  float lethal = sqrt(pow((xP+5) - (bodyCX), 2) + pow( (yP+5) - (bodyCY), 2));
-  fill(255,0,0);
-  triangle(xP,yP, xP+10,yP,xP+5, yP+10);
-  if (xP >= 1250 || yP >= 850){
-    xP = random(100, 1100);
-    yP = -5;
-    variation = random(-1, 1);
+    //inittial trianghles top
+      float lethal = sqrt(pow((xP+5) - (bodyCX), 2) + pow( (yP+5) - (bodyCY), 2));
+      fill(255,0,0);
+      triangle(xP,yP, xP+10,yP,xP+5, yP+10);
+      if (xP >= 1250 || yP >= 850){
+        xP = random(100, 1100);
+        yP = -5;
+        variation = random(-1, 1);
+        }
+      xP += variation*speedP;
+      yP += speedP;
+    //big boy circles top
+      float lethalC = sqrt(pow((xC+5) - (bodyCX), 2) + pow( (yC+5) - (bodyCY), 2));
+      fill(255,0,0);
+      circle(xC, yC, 30);
+      if(seconds >10){
+        if (xC >= 1250 || yC >= 850){
+          xC = random(100, 1100);
+          yC = -5;
+          variationC = random(-2, 2);
+          }
+        xC += variationC*speed;
+        yC += speed;
     }
-  xP += variation*speedP;
-  yP += speedP;
-  //projectile 
-  textSize(32);
-  text(score, 600, 200 );
   // projectiles from left side
-  float lethal2 = sqrt(pow((x2+5) - (bodyCX), 2) + pow( (y2+5) - (bodyCY), 2));
-  triangle(x2,y2, x2+10,y2,x2+5, y2+10);
-  if (x2 >= 1250 || y2 >= 850){
-    x2 = -5;
-    y2 = random(10, floorY-10);
-    variation = random(-1, 1);
-  }
-  x2 += speedP;
-  y2 += variation*speedP;
+    //initial triangles
+      float lethal2 = sqrt(pow((x2+5) - (bodyCX), 2) + pow( (y2+5) - (bodyCY), 2));
+      triangle(x2,y2, x2+10,y2,x2+5, y2+10);
+      if (x2 >= 1250 || y2 >= 850){
+        x2 = -5;
+        y2 = random(10, floorY-10);
+        variation = random(-1, 1);
+      }
+      x2 += speedP;
+      y2 += variation*speedP;
+    //big boy circles left
+      float lethalC2 = sqrt(pow((xC2+5) - (bodyCX), 2) + pow( (yC2+5) - (bodyCY), 2));
+      fill(255,0,0);
+      circle(xC2, yC2, 30);
+      if(seconds >15){
+        if (xC2 >= 1250 || yC2 >= 850){
+          xC2 = -5;
+          yC2 = random(10, floorY-10);
+          variationC = random(-2, 2);
+          }
+        xC2 += speed; 
+        yC2 += variationC*speed;
+      }
+  
   // projectiles from right sidea
-  float lethal3 = sqrt(pow((x3+5) - (bodyCX), 2) + pow((y3+5) - (bodyCY), 2));
-  triangle(x3,y3, x3+10,y3,x3+5, y3+10);
-  if (x3 >= 1250 || y3 >= 850){
-    x3 = 1205;
-    y3 = random(10, floorY-10);
-    variation = random(-1, 1);
-  }
-  x3 -= speedP;
-  y3 += variation*speedP;
+    //initial triangles right
+      float lethal3 = sqrt(pow((x3+5) - (bodyCX), 2) + pow((y3+5) - (bodyCY), 2));
+      triangle(x3,y3, x3+10,y3,x3+5, y3+10);
+      if (x3 >= 1250 || y3 >= 850){
+        x3 = 1205;
+        y3 = random(10, floorY-10);
+        variation = random(-1, 1);
+      }
+      x3 -= speedP;
+      y3 += variation*speedP;
+    //big boy circles right
+      float lethalC3 = sqrt(pow((xC3+5) - (bodyCX), 2) + pow( (yC3+5) - (bodyCY), 2));
+        fill(255,0,0);
+        circle(xC3, yC3, 30);
+        if(seconds > 20){
+          if (xC3 >= 1250 || yC3 >= 850){
+            xC3 = -5;
+            yC3 = random(10, floorY-10);
+            variationC = random(-2, 2);
+            }
+          xC3 += speed;
+          yC3 += variationC*speed;
+        }
   //death
-  if (lethal < 20 || lethal2 < 20 || lethal3 < 20)  {
+  if (lethal < 20 || lethal2 < 20 || lethal3 < 20|| lethalC < 30|| lethalC2 < 30 || lethalC3 < 30)  {
+    grav=0;
     textSize(200);
     text("Game Over", 100, 400);
     textSize(40);
@@ -155,9 +209,11 @@ void draw(){
     speedP =0;
     accel = 0;
     jump = false;
-    grav=0;
     yeet = 0;
+    unit = 0;
+    //restart
       if(restart){
+       accel = 0.001;
        speed = 8;
        score=0;
        speedP = 8;
@@ -172,7 +228,15 @@ void draw(){
        y2=0;
        x3=0;
        y3=0;
+       xC = -30;
+       yC = -30;
+       xC2 = -30;
+       yC2 = -30;
+       xC3 = -30;
+       yC3 = -30;
        yeet = 13;
+       time=0;
+       unit = 1;
      }
   }
  
