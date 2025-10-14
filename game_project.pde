@@ -39,7 +39,7 @@ void setup(){
 }
 void keyPressed(){
    if (key =='w' || key == ' ' ){
-        jump = true;
+    jump = true;
     }
   if(key == 'd'){
     right = true;
@@ -77,10 +77,9 @@ void draw(){
   yR += grav;
   if (yR+50 >= floorY || jump){
     grav = 0;
-  } 
-  else {
-    grav = 8;
-  }
+  } else {
+      grav = 8;
+    }
    if (yR <= 0){
       jump = false;
   }
@@ -116,10 +115,9 @@ void draw(){
   if (distance <= 40) {
     on = false;
     score += 1;
-  } 
-  else {
-    on = true;
-  }
+  } else {
+      on = true;
+    }
   //score board
   textSize(32);
   text(score, 600, 200 );
@@ -199,7 +197,7 @@ void draw(){
           yC3 += variationC*speed;
         }
   //death
-  if (lethal < 20 || lethal2 < 20 || lethal3 < 20|| lethalC < 30|| lethalC2 < 30 || lethalC3 < 30)  {
+  if (lethal <= 20 || lethal2 <= 20 || lethal3 <= 20|| lethalC <= 30|| lethalC2 <= 30 || lethalC3 <= 30)  {
     grav=0;
     textSize(200);
     text("Game Over", 100, 400);
