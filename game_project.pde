@@ -3,6 +3,9 @@ boolean left;
 boolean right;
 boolean on = true;
 boolean restart = false;
+boolean shield = false;
+boolean shieldUnlock = false;
+boolean in = false;
 float grav = 20;
 float speed = 8;
 float speedP = 8;
@@ -30,16 +33,25 @@ float variationC = 1;
 float accel =0.001;
 float time;
 int unit = 1;
-
-
-
+PShape card, button, skillCard;
+int i = 0;
+float skill1 = 1;
+float skill2 = 1;
+float skill3 = 1;
+float coolS = 0;
 void setup(){
   size(1200,800);
   frameRate(60);
+  skillCard = createShape(GROUP);
+  card =  createShape(RECT, 20, 20, 200, 300);
+  button = createShape(RECT, 40, 250, 160, 40);
+  skillCard.addChild(card);
+  skillCard.addChild(button);
+  
 }
 void keyPressed(){
    if (key =='w' || key == ' ' ){
-    jump = true;
+        jump = true;
     }
   if(key == 'd'){
     right = true;
@@ -51,7 +63,6 @@ void keyPressed(){
     restart = true;
   }
 }
-
 void keyReleased(){
   if (key =='w' || key == ' '){
     jump = false;
@@ -71,15 +82,17 @@ void draw(){
   line(0,floorY, 1200, 750);
   speedP += accel;
   time += unit;
+ 
   float seconds = time/60;
    text(seconds, 20,20);
   //rules
   yR += grav;
   if (yR+50 >= floorY || jump){
     grav = 0;
-  } else {
-      grav = 8;
-    }
+  } 
+  else {
+    grav = 8;
+  }
    if (yR <= 0){
       jump = false;
   }
@@ -115,9 +128,10 @@ void draw(){
   if (distance <= 40) {
     on = false;
     score += 1;
-  } else {
-      on = true;
-    }
+  } 
+  else {
+    on = true;
+  }
   //score board
   textSize(32);
   text(score, 600, 200 );
@@ -196,8 +210,125 @@ void draw(){
           xC3 += speed;
           yC3 += variationC*speed;
         }
+  // upgrades
+  if (score == 4 || score == 8 || score == 59){
+    in = true;
+  }
+  if (score == 5 || score == 9 || score == 60) {
+    if (in){
+    grav=0;
+    speed = 0;
+    speedP =0;
+    accel = 0;
+    jump = false;
+    yeet = 0;
+    unit = 0;
+    textSize(100);
+    text("pick an upgrade", 300 ,100);
+    shape(skillCard, 200, 300);
+    shape(skillCard, 500, 300);
+    shape(skillCard, 800, 300);
+    
+   if (mouseX>240 && mouseX< 400 && mouseY < 590 && mouseY > 550 ){
+      if ( mousePressed && (mouseButton == LEFT)){
+      skill1 ++;
+      shieldUnlock = true;
+      in = false;
+      grav=20;
+      speed = 8;
+      speedP =8;
+      accel = 0.001;
+      jump = false;
+      yeet = 13;
+      unit = 1;
+      }
+    }
+  //skill from list
+        if (skill1 == 1){
+          textSize(32);
+          text("shield",240,400);
+          textSize(20);
+          text(" temporary protection \n from this hell. \n (hold right click to \n deploy a shield)", 235, 450);
+        }
+        if (skill1 == 2){
+          textSize(32);
+          text("shield big",240,400);
+        }
+        if (skill1 == 3){
+          textSize(32);
+          text("shield mega",240,400);
+        }
+        if (skill2 == 1){
+          textSize(32);
+          text("click delete",540,400);
+        }
+        if (skill2 == 2){
+          textSize(32);
+          text("bigger range",540,400);
+        }  
+        if (skill2 == 3){
+          textSize(32);
+          text("drag",540,400);
+        }
+        if (skill3 == 1){
+          textSize(32);
+          text("dash",840,400);
+        }
+        if (skill3 == 2){
+          textSize(32);
+          text("double dash",840,400);
+        }  
+        if (skill3 == 3){
+          textSize(32);
+          text("3",840,400);
+        }
+    }
+  }
+  //shield skill
+  if (mousePressed && (mouseButton == RIGHT)){
+    shield = true;
+  } else { 
+    shield = false;
+  }
+  if (shieldUnlock && coolS <= 240){
+    if (shield){
+    coolS ++;
+      if (coolS <= 60){
+        noFill();
+        stroke(0,25,240);
+        strokeWeight(30);
+        circle(bodyCX, bodyCY, 100);
+        stroke(0);
+        strokeWeight(1);
+        if (lethal < 50){
+           xP = 0;
+           yP=0;
+        }else if (lethal2 < 50){ 
+           x2=0;
+           y2=0;
+        }else if (lethal3 < 50 ){ 
+           x3=0;
+           y3=0;
+        }else if (lethalC < 60){ 
+           xC = -30;
+           yC = -30;
+        }else if (lethalC2 < 60) {
+           xC2 = -30;
+           yC2 = -30;
+        }else if (lethalC3 < 60){
+           xC3 = -30;
+           yC3 = -30;
+        }
+      }
+    }
+    if (coolS == 240){
+        coolS =0;
+  }
+  
+  }
+    
   //death
-  if (lethal <= 20 || lethal2 <= 20 || lethal3 <= 20|| lethalC <= 30|| lethalC2 <= 30 || lethalC3 <= 30)  {
+  if (lethal < 20 || lethal2 < 20 || lethal3 < 20|| lethalC < 30|| lethalC2 < 30 || lethalC3 < 30)  {
     grav=0;
     textSize(200);
     text("Game Over", 100, 400);
@@ -209,6 +340,7 @@ void draw(){
     jump = false;
     yeet = 0;
     unit = 0;
+    shieldUnlock=false;
     //restart
       if(restart){
        accel = 0.001;
@@ -235,7 +367,12 @@ void draw(){
        yeet = 13;
        time=0;
        unit = 1;
+       skill1 =1;
+       skill2 =1;
+       skill3 =1;
      }
   }
- 
+  textSize(20);
+  text(mouseX, mouseX+10, mouseY);
+  text(mouseY, mouseX, mouseY-10);
 }
