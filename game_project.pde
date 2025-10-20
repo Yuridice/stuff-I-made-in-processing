@@ -35,10 +35,13 @@ float time;
 int unit = 1;
 PShape card, button, skillCard;
 int i = 0;
-float skill1 = 1;
-float skill2 = 1;
-float skill3 = 1;
-float coolS = 0;
+int skill1 = 1;
+int skill2 = 1;
+int skill3 = 1;
+float coolS = 120;
+float shieldSize=100;
+boolean regen;
+
 void setup(){
   size(1200,800);
   frameRate(60);
@@ -50,10 +53,10 @@ void setup(){
   
 }
 void keyPressed(){
-   if (key =='w' || key == ' ' ){
+   if (key =='w' || key == ' ' ||key=='W' ){
         jump = true;
     }
-  if(key == 'd'){
+  if(key == 'd'||key == 'D'){
     right = true;
   }
   if(key =='a'){
@@ -211,10 +214,10 @@ void draw(){
           yC3 += variationC*speed;
         }
   // upgrades
-  if (score == 4 || score == 8 || score == 59){
+  if (score == 0 || score == 8 || score == 59){
     in = true;
   }
-  if (score == 5 || score == 9 || score == 60) {
+  if (score == 1 || score == 9 || score == 60) {
     if (in){
     grav=0;
     speed = 0;
@@ -244,43 +247,52 @@ void draw(){
       }
     }
   //skill from list
-        if (skill1 == 1){
-          textSize(32);
-          text("shield",240,400);
-          textSize(20);
-          text(" temporary protection \n from this hell. \n (hold right click to \n deploy a shield)", 235, 450);
-        }
-        if (skill1 == 2){
-          textSize(32);
-          text("shield big",240,400);
-        }
-        if (skill1 == 3){
-          textSize(32);
-          text("shield mega",240,400);
-        }
-        if (skill2 == 1){
-          textSize(32);
-          text("click delete",540,400);
-        }
-        if (skill2 == 2){
-          textSize(32);
-          text("bigger range",540,400);
-        }  
-        if (skill2 == 3){
-          textSize(32);
-          text("drag",540,400);
-        }
-        if (skill3 == 1){
+       switch (skill1){
+           case 1:
+            textSize(32);
+            text("shield",240,400);
+            textSize(20);
+            text(" temporary protection \n from this hell. \n (hold right click to \n deploy a shield)", 235, 450);
+            break;
+        
+          case 2:
+            textSize(32);
+            text("shield big",240,400);
+            shieldSize = 120;
+            break;
+          case 3:
+            textSize(32);
+            text("shield mega",240,400);
+            shieldSize = 180;
+            break;
+       }
+       switch (skill2){
+          case 1:
+            textSize(32);
+            text("Rotating defender",540,400);
+            break;
+          case 2:
+            textSize(32);
+            text("bigger range",540,400);
+            break;
+          case 3:
+            textSize(32);
+            text("drag",540,400);
+            break;
+       }
+       switch(skill3){
+        case 1:
           textSize(32);
           text("dash",840,400);
-        }
-        if (skill3 == 2){
+          break;
+        case 2:
           textSize(32);
           text("double dash",840,400);
-        }  
-        if (skill3 == 3){
+          break;
+        case 3:
           textSize(32);
           text("3",840,400);
+          break;
         }
     }
   }
@@ -290,43 +302,53 @@ void draw(){
   } else { 
     shield = false;
   }
-  if (shieldUnlock && coolS <= 240){
-    if (shield){
-    coolS ++;
-      if (coolS <= 60){
+  if (shieldUnlock){
+    fill(0,0,255);
+    float coolDown = coolS/60;
+    rect (900, 100, coolDown*100, 20);
+    text("Cool down : ", 900, 50) ;
+    if (coolS == 0){
+      regen = false;
+    }
+    if (coolS == 120){
+      regen = true;
+    }
+    if (!regen){
+      coolS ++;
+    }
+    if (shield && regen && coolS > 0){
         noFill();
         stroke(0,25,240);
         strokeWeight(30);
-        circle(bodyCX, bodyCY, 100);
+        circle(bodyCX, bodyCY, shieldSize);
         stroke(0);
         strokeWeight(1);
-        if (lethal < 50){
+        coolS -=1;
+        if (lethal < shieldSize/2){
            xP = 0;
-           yP=0;
-        }else if (lethal2 < 50){ 
+           yP = 0;
+        }else if (lethal2 < shieldSize/2){ 
            x2=0;
            y2=0;
-        }else if (lethal3 < 50 ){ 
+        }else if (lethal3 < shieldSize/2 ){ 
            x3=0;
            y3=0;
-        }else if (lethalC < 60){ 
+        }else if (lethalC < shieldSize/2 + 10){ 
            xC = -30;
            yC = -30;
-        }else if (lethalC2 < 60) {
+        }else if (lethalC2 < shieldSize/2 + 10) {
            xC2 = -30;
            yC2 = -30;
-        }else if (lethalC3 < 60){
+        }else if (lethalC3 < shieldSize/2 + 10){
            xC3 = -30;
            yC3 = -30;
         }
       }
     }
-    if (coolS == 240){
-        coolS =0;
-  }
+
+
+  // perma rotate shield skill
   
-  }
-    
   //death
   if (lethal < 20 || lethal2 < 20 || lethal3 < 20|| lethalC < 30|| lethalC2 < 30 || lethalC3 < 30)  {
     grav=0;
