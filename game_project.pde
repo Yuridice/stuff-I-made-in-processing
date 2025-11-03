@@ -5,6 +5,8 @@ boolean on = true;
 boolean restart = false;
 boolean shield = false;
 boolean shieldUnlock = false;
+boolean defenderUnlock = false;
+boolean dashUnlock = false;
 boolean in = false;
 float grav = 20;
 float speed = 8;
@@ -32,6 +34,7 @@ float variation = 1;
 float variationC = 1;
 float accel =0.001;
 float time;
+float angle = 0;
 int unit = 1;
 PShape card, button, skillCard;
 int i = 0;
@@ -41,6 +44,15 @@ int skill3 = 1;
 float coolS = 120;
 float shieldSize=100;
 boolean regen;
+float countdown = 0;
+boolean lessReload=false;
+boolean maxReload=false;
+boolean dash = false;
+float accru;
+float flicker;
+float limit;
+float timeLimit;
+float delay;
 
 void setup(){
   size(1200,800);
@@ -53,7 +65,7 @@ void setup(){
   
 }
 void keyPressed(){
-   if (key =='w' || key == ' ' ||key=='W' ){
+   if (key =='w'||key=='W' ){
         jump = true;
     }
   if(key == 'd'||key == 'D'){
@@ -65,9 +77,12 @@ void keyPressed(){
   if(key == 'R'){
     restart = true;
   }
+  if ( key == ' ' ){
+    dash=true;
+  }
 }
 void keyReleased(){
-  if (key =='w' || key == ' '){
+  if (key =='w' || key == 'W'){
     jump = false;
   }
   if(key == 'd'){
@@ -79,6 +94,9 @@ void keyReleased(){
   if(key == 'R'){
     restart = false;
   }
+  if ( key == ' ' ){
+    dash=false;
+  }
 }
 void draw(){
   background(40);
@@ -87,7 +105,7 @@ void draw(){
   time += unit;
  
   float seconds = time/60;
-   text(seconds, 20,20);
+   
   //rules
   yR += grav;
   if (yR+50 >= floorY || jump){
@@ -127,7 +145,7 @@ void draw(){
   fill (255,255,0);
   circle(x,y,20);
   //  hit boxes for objectives
-  float distance = sqrt(pow(x - xR, 2) + pow(y - yR, 2));
+  float distance = sqrt(pow(x - bodyCX, 2) + pow(y - bodyCY, 2));
   if (distance <= 40) {
     on = false;
     score += 1;
@@ -161,8 +179,7 @@ void draw(){
           yC = -5;
           variationC = random(-2, 2);
           }
-        xC += variationC*speed;
-        yC += speed;
+        xC += variationC*speedP;
     }
   // projectiles from left side
     //initial triangles
@@ -185,8 +202,8 @@ void draw(){
           yC2 = random(10, floorY-10);
           variationC = random(-2, 2);
           }
-        xC2 += speed; 
-        yC2 += variationC*speed;
+        xC2 += speedP; 
+        yC2 += variationC*speedP;
       }
   
   // projectiles from right sidea
@@ -210,8 +227,8 @@ void draw(){
             yC3 = random(10, floorY-10);
             variationC = random(-2, 2);
             }
-          xC3 += speed;
-          yC3 += variationC*speed;
+          xC3 += speedP;
+          yC3 += variationC*speedP;
         }
   // upgrades
   if (score == 0 || score == 8 || score == 59){
@@ -231,11 +248,39 @@ void draw(){
     shape(skillCard, 200, 300);
     shape(skillCard, 500, 300);
     shape(skillCard, 800, 300);
-    
+    //slect skill1
    if (mouseX>240 && mouseX< 400 && mouseY < 590 && mouseY > 550 ){
       if ( mousePressed && (mouseButton == LEFT)){
       skill1 ++;
       shieldUnlock = true;
+      in = false;
+      grav=20;
+      speed = 8;
+      speedP =8;
+      accel = 0.001;
+      jump = false;
+      yeet = 13;
+      unit = 1;
+      }
+    }
+    if (mouseX>540 && mouseX< 700 && mouseY < 590 && mouseY > 550 ){
+      if ( mousePressed && (mouseButton == LEFT)){
+      skill2 ++;
+      defenderUnlock = true;
+      in = false;
+      grav=20;
+      speed = 8;
+      speedP =8;
+      accel = 0.001;
+      jump = false;
+      yeet = 13;
+      unit = 1;
+      }
+    }
+    if (mouseX>840 && mouseX< 1000 && mouseY < 590 && mouseY > 550 ){
+      if ( mousePressed && (mouseButton == LEFT)){
+      skill3 ++;
+      dashUnlock = true;
       in = false;
       grav=20;
       speed = 8;
@@ -269,34 +314,40 @@ void draw(){
        switch (skill2){
           case 1:
             textSize(32);
-            text("Rotating defender",540,400);
+            text("defender",540,400);
             break;
           case 2:
             textSize(32);
-            text("bigger range",540,400);
+            text("less reload time",540,400);
+            lessReload=true;
             break;
           case 3:
             textSize(32);
-            text("drag",540,400);
+            text("even less reload time",540,400);
+            maxReload=true;
+            lessReload=false;
             break;
        }
        switch(skill3){
         case 1:
           textSize(32);
           text("dash",840,400);
+          limit=0;
           break;
         case 2:
           textSize(32);
           text("double dash",840,400);
+          limit=1;
           break;
         case 3:
           textSize(32);
-          text("3",840,400);
+          text("triple dash",840,400);
+          limit=2;
           break;
         }
     }
   }
-  //shield skill
+  //shield skill1
   if (mousePressed && (mouseButton == RIGHT)){
     shield = true;
   } else { 
@@ -347,8 +398,78 @@ void draw(){
     }
 
 
-  // perma rotate shield skill
-  
+  //  defender skill2
+  if(defenderUnlock){
+    noFill();
+    strokeWeight(4);
+    stroke(255,0,0);
+    circle(mouseX,mouseY,20);
+    float shot1 = sqrt(pow((xP+5) - mouseX, 2) + pow( (yP+5) - mouseY, 2));
+    float shot2 = sqrt(pow((x2+5) - mouseX, 2) + pow( (y2+5) - mouseY, 2));
+    float shot3 = sqrt(pow((x3+5) - mouseX, 2) + pow( (y3+5) - mouseY, 2));
+    float shot4 = sqrt(pow((xC+5) - mouseX, 2) + pow( (yC+5) - mouseY, 2));
+    float shot5 = sqrt(pow((xC2+5) - mouseX, 2) + pow( (yC2+5) - mouseY, 2));
+    float shot6 = sqrt(pow((xC3+5) - mouseX, 2) + pow( (yC3+5) - mouseY, 2));
+    if (countdown != 0){
+      countdown --;
+    }
+    if(mousePressed && (mouseButton == LEFT) && countdown == 0){
+      if (shot1 <30){
+           xP = 0;
+           yP = 0;
+        }else if (shot2 < 30){ 
+           x2=0;
+           y2=0;
+        }else if (shot3 < 30){ 
+           x3=0;
+           y3=0;
+        }else if (shot4 < 30){ 
+           xC = -30;
+           yC = -30;
+        }else if (shot5 < 30) {
+           xC2 = -30;
+           yC2 = -30;
+        }else if (shot6 < 30){
+           xC3 = -30;
+           yC3 = -30;
+        }
+        if (lessReload){
+          countdown= 100;
+        }else if (maxReload){
+          countdown = 60;
+        } else{
+          countdown = 140;
+        }
+     }   
+     strokeWeight(1);
+     fill(255,0,0);
+     stroke(0);
+     rect(mouseX-10, mouseY+30, countdown*0.9, 5);
+  }
+  // dash skill3
+  if (dashUnlock){
+    fill(200,30,90);
+    if (timeLimit>60 || accru != 0){
+      flicker=0;
+    }
+    if(dash && flicker == 0 && (timeLimit>30 || accru != 0)){
+      speed=100;
+      flicker++;
+      if (accru!=0){
+        accru --;
+      }
+      timeLimit = 0;
+    }else{
+      speed=8;
+      timeLimit ++;
+    }
+    if (delay >= 120 && accru < limit){
+      accru ++;
+      delay = 0;
+    }
+    delay++;
+    text(floor(accru), 1100,700);
+  }
   //death
   if (lethal < 20 || lethal2 < 20 || lethal3 < 20|| lethalC < 30|| lethalC2 < 30 || lethalC3 < 30)  {
     grav=0;
@@ -363,6 +484,8 @@ void draw(){
     yeet = 0;
     unit = 0;
     shieldUnlock=false;
+    defenderUnlock=false;
+    dashUnlock = false;
     //restart
       if(restart){
        accel = 0.001;
@@ -394,7 +517,10 @@ void draw(){
        skill3 =1;
      }
   }
+  //dev tools
+  text(seconds, 20,20);
   textSize(20);
-  text(mouseX, mouseX+10, mouseY);
-  text(mouseY, mouseX, mouseY-10);
+  print();
+  //text(mouseX, mouseX+10, mouseY);
+  //text(mouseY, mouseX, mouseY-10);
 }
