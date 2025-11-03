@@ -53,6 +53,7 @@ float flicker;
 float limit;
 float timeLimit;
 float delay;
+int goal;
 
 void setup(){
   size(1200,800);
@@ -103,7 +104,7 @@ void draw(){
   line(0,floorY, 1200, 750);
   speedP += accel;
   time += unit;
- 
+  goal=50; //end 
   float seconds = time/60;
    
   //rules
@@ -139,8 +140,8 @@ void draw(){
   float bodyCY = yR + 25;
   // objectives
   if(!on){
-    x = random(10,1190);
-    y = random(10,floorY-10);
+    x = random(100,1100);
+    y = random(100,floorY-10);
   }
   fill (255,255,0);
   circle(x,y,20);
@@ -156,6 +157,10 @@ void draw(){
   //score board
   textSize(32);
   text(score, 600, 200 );
+  noFill();
+  rect(350,30, goal*10, 10);
+  fill(255,255,10);
+  rect(350,30, score*10, 10);
   //projectiles 
   // projectiles from top
     //inittial trianghles top
@@ -231,10 +236,10 @@ void draw(){
           yC3 += variationC*speedP;
         }
   // upgrades
-  if (score == 0 || score == 8 || score == 59){
+  if (score == 9 || score == 19 || score == 29){
     in = true;
   }
-  if (score == 1 || score == 9 || score == 60) {
+  if (score == 10 || score == 20 || score == 30) {
     if (in){
     grav=0;
     speed = 0;
@@ -248,7 +253,11 @@ void draw(){
     shape(skillCard, 200, 300);
     shape(skillCard, 500, 300);
     shape(skillCard, 800, 300);
-    //slect skill1
+    textSize(32);
+    text("select", 280, 580);
+    text("select", 580, 580);
+    text("select", 880, 580);
+    //select skill1
    if (mouseX>240 && mouseX< 400 && mouseY < 590 && mouseY > 550 ){
       if ( mousePressed && (mouseButton == LEFT)){
       skill1 ++;
@@ -303,11 +312,15 @@ void draw(){
           case 2:
             textSize(32);
             text("shield big",240,400);
+            textSize(20);
+            text(" Ahhhh.\n a little more space! \n FINALLY!",235,450);
             shieldSize = 120;
             break;
           case 3:
             textSize(32);
             text("shield mega",240,400);
+            textSize(20);
+            text(" ain't no one \n hurtin me today!",235,450);
             shieldSize = 180;
             break;
        }
@@ -315,15 +328,21 @@ void draw(){
           case 1:
             textSize(32);
             text("defender",540,400);
+            textSize(20);
+            text(" We got eyes in \n the sky now boys! \n (left click on \n projectiles to kill) ",535,450);
             break;
           case 2:
             textSize(32);
             text("less reload time",540,400);
+            textSize(20);
+            text("Hey! \n Are they gettin better or something? ",535,450);
             lessReload=true;
             break;
           case 3:
             textSize(32);
             text("even less reload time",540,400);
+            textSize(20);
+            text("Not gonna lie boys, this guy's good!",535,450);
             maxReload=true;
             lessReload=false;
             break;
@@ -332,16 +351,22 @@ void draw(){
         case 1:
           textSize(32);
           text("dash",840,400);
+          textSize(20);
+          text("GOTTA GO FAST BOYS! \n (press space to dash)",835,450);
           limit=0;
           break;
         case 2:
           textSize(32);
           text("double dash",840,400);
+          textSize(20);
+          text("I AM SPEEED! \n (can now dash twice\n in a row)",835,450);
           limit=1;
           break;
         case 3:
           textSize(32);
           text("triple dash",840,400);
+          textSize(20);
+          text("HELP! HOW DO I STOP!!!! \n (can now dash thrice \n in a row)",835,450);
           limit=2;
           break;
         }
@@ -468,6 +493,8 @@ void draw(){
       delay = 0;
     }
     delay++;
+    textSize(30);
+    text("avilable \n dashes", 1050, 625);
     text(floor(accru), 1100,700);
   }
   //death
@@ -516,6 +543,54 @@ void draw(){
        skill2 =1;
        skill3 =1;
      }
+  }
+  //end game
+  if (score == goal){
+    grav=0;
+    fill(0,200,0);
+    textSize(200);
+    text("YOU WIN!", 200, 400);
+    textSize(40);
+    text("Press shift + r to restart", 400, 600);
+    speed = 0;
+    speedP =0;
+    accel = 0;
+    jump = false;
+    yeet = 0;
+    unit = 0;
+    shieldUnlock=false;
+    defenderUnlock=false;
+    dashUnlock = false;
+    //restart
+      if(restart){
+       accel = 0.001;
+       speed = 8;
+       score=0;
+       speedP = 8;
+       grav = 20;
+       xR =600;
+       yR = 650;
+       x = 600;
+       y = 400;
+       xP = 0;
+       yP=0;
+       x2=0;
+       y2=0;
+       x3=0;
+       y3=0;
+       xC = -30;
+       yC = -30;
+       xC2 = -30;
+       yC2 = -30;
+       xC3 = -30;
+       yC3 = -30;
+       yeet = 13;
+       time=0;
+       unit = 1;
+       skill1 =1;
+       skill2 =1;
+       skill3 =1;
+      }
   }
   //dev tools
   text(seconds, 20,20);
