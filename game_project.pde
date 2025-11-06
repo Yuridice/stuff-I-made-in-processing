@@ -202,7 +202,7 @@ void draw(){
       float lethalC2 = sqrt(pow((xC2+5) - (bodyCX), 2) + pow( (yC2+5) - (bodyCY), 2));
       fill(255,0,0);
       circle(xC2, yC2, 30);
-      if(seconds >1){
+      if(seconds >15){
         if (xC2 >= 1250 || yC2 >= 850 || yC2< -30){
           xC2 = -5;
           yC2 = random(30, floorY-10);
