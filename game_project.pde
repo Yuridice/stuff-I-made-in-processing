@@ -54,6 +54,7 @@ float limit;
 float timeLimit;
 float delay;
 int goal;
+boolean death = false;
 
 void setup(){
   size(1200,800);
@@ -201,10 +202,10 @@ void draw(){
       float lethalC2 = sqrt(pow((xC2+5) - (bodyCX), 2) + pow( (yC2+5) - (bodyCY), 2));
       fill(255,0,0);
       circle(xC2, yC2, 30);
-      if(seconds >15){
-        if (xC2 >= 1250 || yC2 >= 850){
+      if(seconds >1){
+        if (xC2 >= 1250 || yC2 >= 850 || yC2< -30){
           xC2 = -5;
-          yC2 = random(10, floorY-10);
+          yC2 = random(30, floorY-10);
           variationC = random(-2, 2);
           }
         xC2 += speedP; 
@@ -498,7 +499,8 @@ void draw(){
     text(floor(accru), 1100,700);
   }
   //death
-  if (lethal < 20 || lethal2 < 20 || lethal3 < 20|| lethalC < 30|| lethalC2 < 30 || lethalC3 < 30)  {
+  if ((lethal < 20 || lethal2 < 20 || lethal3 < 20|| lethalC < 30|| lethalC2 < 30 || lethalC3 < 30)||death)  {
+    death = true;
     grav=0;
     textSize(200);
     text("Game Over", 100, 400);
@@ -515,6 +517,7 @@ void draw(){
     dashUnlock = false;
     //restart
       if(restart){
+       death = false;
        accel = 0.001;
        speed = 8;
        score=0;
@@ -593,9 +596,9 @@ void draw(){
       }
   }
   //dev tools
-  text(seconds, 20,20);
-  textSize(20);
-  print();
-  //text(mouseX, mouseX+10, mouseY);
-  //text(mouseY, mouseX, mouseY-10);
+    //text(seconds, 20,20);
+    //textSize(20);
+    //print();
+    //text(mouseX, mouseX+10, mouseY);
+    //text(mouseY, mouseX, mouseY-10);
 }
